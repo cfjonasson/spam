@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Notis spam</title>
+</head>
+<body>
+  <h2>Notis-spam test</h2>
+  <button onclick="startSpam()">Starta notiser</button>
+
+
+  <script>
+    function startSpam() {
+      Notification.requestPermission().then(permission => {
+        if (permission !== "granted") {
+          alert("Du måste tillåta notiser först!");
+          return;
+        }
+
+
+        setInterval(() => {
+          new Notification("kuligt va");
+        }, 1000);
+      });
+    }
+  </script>
+</body>
+</html>
