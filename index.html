@@ -19,19 +19,19 @@
       padding: 30px;
       border-radius: 16px;
       text-align: center;
-      width: 300px;
+      width: 320px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
 
     h1 {
       font-size: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     button {
       width: 100%;
       padding: 12px;
-      margin: 8px 0;
+      margin: 6px 0;
       border: none;
       border-radius: 10px;
       font-size: 14px;
@@ -48,8 +48,17 @@
       color: white;
     }
 
-    .status {
+    .stats {
       margin-top: 15px;
+      text-align: left;
+      font-size: 13px;
+      background: #0b1220;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .status {
+      margin-top: 10px;
       font-size: 12px;
       opacity: 0.8;
     }
@@ -58,10 +67,16 @@
 
 <body>
   <div class="card">
-    <h1>🔔 Notis System</h1>
+    <h1>🔔 Notis Dashboard</h1>
 
-    <button class="start" onclick="startNotifications()">Start notifications</button>
-    <button class="stop" onclick="stopNotifications()">Stop notifications</button>
+    <button class="start" onclick="startNotifications()">Start</button>
+    <button class="stop" onclick="stopNotifications()">Stop</button>
+
+    <div class="stats">
+      <div>📨 Notiser: <span id="count">0</span></div>
+      <div>⏱️ Tid: <span id="time">0</span> sek</div>
+      <div>⚡ Rate: <span id="rate">0</span> /sek</div>
+    </div>
 
     <div class="status" id="status">Status: idle</div>
   </div>
@@ -69,30 +84,46 @@
   <script>
     let interval = null;
     let count = 0;
+    let startTime = null;
+    let timer = null;
 
     async function startNotifications() {
       const perm = await Notification.requestPermission();
-
       if (perm !== "granted") {
         alert("Tillåt notiser först!");
         return;
       }
 
-      if (interval) return; // hindrar dubbla loops
+      if (interval) return;
+
+      count = 0;
+      startTime = Date.now();
 
       document.getElementById("status").innerText = "Status: running";
 
+      // Notis loop
       interval = setInterval(() => {
         count++;
         new Notification("de la checkt #" + count);
+        document.getElementById("count").innerText = count;
       }, 2000);
+
+      // Statistik updatering
+      timer = setInterval(() => {
+        let seconds = Math.floor((Date.now() - startTime) / 1000);
+        let rate = (count / (seconds || 1)).toFixed(2);
+
+        document.getElementById("time").innerText = seconds;
+        document.getElementById("rate").innerText = rate;
+      }, 500);
     }
 
     function stopNotifications() {
-      if (interval) {
-        clearInterval(interval);
-        interval = null;
-      }
+      clearInterval(interval);
+      clearInterval(timer);
+
+      interval = null;
+      timer = null;
 
       document.getElementById("status").innerText = "Status: stopped";
     }
