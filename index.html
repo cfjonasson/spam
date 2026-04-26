@@ -1,24 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Notis spam</title>
+  <title>Notis Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .start {
+      background: #22c55e;
+      color: black;
+    }
+
+    .stop {
+      background: #ef4444;
+      color: white;
+    }
+
+    .status {
+      margin-top: 15px;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+  </style>
 </head>
+
 <body>
-  <h2>Notis-spam test</h2>
-  <button onclick="startSpam()">Starta notiser</button>
+  <div class="card">
+    <h1>🔔 Notis System</h1>
+
+    <button class="start" onclick="startNotifications()">Start notifications</button>
+    <button class="stop" onclick="stopNotifications()">Stop notifications</button>
+
+    <div class="status" id="status">Status: idle</div>
+  </div>
 
   <script>
-    function startSpam() {
-      Notification.requestPermission().then(permission => {
-        if (permission !== "granted") {
-          alert("Du måste tillåta notiser först!");
-          return;
-        }
+    let interval = null;
+    let count = 0;
 
-        setInterval(() => {
-          new Notification("test");
-        }, 1000);
-      });
+    async function startNotifications() {
+      const perm = await Notification.requestPermission();
+
+      if (perm !== "granted") {
+        alert("Tillåt notiser först!");
+        return;
+      }
+
+      if (interval) return; // hindrar dubbla loops
+
+      document.getElementById("status").innerText = "Status: running";
+
+      interval = setInterval(() => {
+        count++;
+        new Notification("de la checkt #" + count);
+      }, 2000);
+    }
+
+    function stopNotifications() {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+
+      document.getElementById("status").innerText = "Status: stopped";
     }
   </script>
 </body>
